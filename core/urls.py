@@ -3,5 +3,8 @@ from . import views
 
 app_name='core'
 urlpatterns = [
-    path("", views.index,name='home')
+    path("", views.index,name='home'),
+    path("login", views.handle_login,name='login'),
+    path("logout", views.handle_logout,name='logout'),
+    path("videocall/<str:username>", views.videocall,name='videocall'),
 ]

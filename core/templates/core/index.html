@@ -24,7 +24,14 @@
             <!-- Navigation Links (Initially Hidden) -->
             <nav id="navLinks" class="hidden md:flex absolute top-full left-0 bg-white w-full py-2 px-4 shadow-md">
                 <a href="#" class="text-gray-800 hover:underline">Home</a>
-                <a href="#" class="text-gray-800 hover:underline ml-4">Profile</a>
+
+                {% if request.user.is_authenticated  %}
+                <a href={% url 'core:logout' %} class="text-gray-800 hover:underline ml-4">Logout</a>
+                {% else %}
+                <a href={% url 'core:login' %} class="text-gray-800 hover:underline ml-4">Login</a>
+
+                {% endif %} 
+
                 <a href="#" class="text-gray-800 hover:underline ml-4">Settings</a>
             </nav>
         </div>
@@ -35,20 +42,21 @@
         <h1 class="text-2xl font-semibold mb-4">Available Mentors</h1>
         <!-- Mentor Cards -->
         <div id="mentorCards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Mentor Card 1 -->
+
+            {%for mentor in mentors%}
+            <!-- Mentor Card  -->
             <div class="bg-white rounded-lg shadow-md p-4">
                 <div class="details-container flex justify-start">
                     <img width="56px" src="https://images.pexels.com/photos/3190334/pexels-photo-3190334.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Mentor 1" class="h-auto rounded-full mb-4">
                     <div class="details ml-2">
-                        <h2 class="text-lg font-semibold mb-2">Jane Smith</h2>
-                        <p class="text-gray-600 text-sm mb-4">Expert in Physics</p>
+                        <h2 class="text-lg font-semibold mb-2">{{mentor.first_name}} {{mentor.last_name}}</h2>
+                        <p class="text-gray-600 text-sm mb-4">@{{mentor.username}}</p>
                     </div>
                 </div>
-                <button class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Video Call</button>
-                <button class="border border-green-600 text-green-600 px-4 py-2 rounded-full ml-2 hover:bg-green-100">View Profile</button>
+                <a href={% url 'core:videocall' username=mentor.username%}><button class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Video Call</button></a>
+                <a href="#"><button class="border border-green-600 text-green-600 px-4 py-2 rounded-full ml-2 hover:bg-green-100">View Profile</button></a>
             </div>
-            <!-- Mentor Card 2 -->
-            <!-- Add additional Mentor Cards here -->
+{%endfor%}
         </div>
     </section>
 
