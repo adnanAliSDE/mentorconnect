@@ -1,96 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Your website description here" />
-    <title>Video Calling Screen</title>
-    <!-- Font Awesome CDN -->
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-      rel="stylesheet"
-    />
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    {% load static %}
-    <!-- Custom CSS -->
-    <style>
-      /* Add your custom CSS styles here */
-      .video-containers {
-        min-height: calc(
-          100vh - 12rem
-        ); /* Adjust based on header and footer height */
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Your website description here" />
+  <title>Video Calling Screen</title>
+  <!-- Font Awesome CDN -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  {% load static %}
+  <!-- Custom CSS -->
+  <style>
+    /* Add your custom CSS styles here */
+    .video-containers {
+      min-height: calc(100vh - 12rem);
+      /* Adjust based on header and footer height */
+    }
+
+    .mentor-video-container {
+      z-index: 1;
+      /* Ensure the mentor's video is below the user's video */
+    }
+
+    .mentor-name {
+      z-index: 10;
+      /* Ensure the name is displayed on top of the video */
+    }
+
+    /* Modal styling */
+    #callStatusModal {
+      z-index: 9999;
+    }
+
+    .modal-overlay {
+      z-index: -1;
+    }
+
+    .modal-container {
+      z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+
+    /* Animation for scaling */
+    .modal-container.scale-0 {
+      transform: scale(0);
+    }
+
+    .modal-container.scale-1 {
+      transform: scale(1);
+    }
+
+    /* Spinner animation */
+    .spinner {
+      border: 4px solid #d3fde8;
+      border-left-color: #00a652;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
       }
 
-      .mentor-video-container {
-        z-index: 1; /* Ensure the mentor's video is below the user's video */
+      100% {
+        transform: rotate(360deg);
       }
+    }
+  </style>
+</head>
 
-      .mentor-name {
-        z-index: 10; /* Ensure the name is displayed on top of the video */
-      }
+<body class="bg-gray-100">
 
-    </style>
-  </head>
-  <body class="bg-gray-100">
-    <!-- Top Bar -->
-    <header
-      class="top-bar bg-green-600 text-white py-4 fixed w-full top-0 flex items-center justify-between px-4"
-    >
-      <button class="text-white">
-        <i class="fas fa-arrow-left text-xl"></i>
-      </button>
-      <div class="text-center">
-        <span class="text-sm">00:00</span>
-      </div>
-      <button class="text-white">
-        <i class="fas fa-camera text-xl"></i>
-      </button>
-    </header>
+  <div id="callStatusModal" class="fixed inset-0 flex items-center justify-center hidden">
+    <div class="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
+    <div class="modal-container bg-white w-96 p-6 rounded-lg shadow-lg transform scale-0">
+      <div class="spinner mx-auto"></div> <!-- Spinner element -->
+      <div id="callStatusContent" class="text-center mt-4">Connecting...</div>
+    </div>
+  </div>
 
-    <!-- Video Containers -->
-    <main
-      class="video-containers flex flex-col items-center justify-center pt-16"
-    >
-      <div class="mentor-video-container bg-black w-full h-3/4 relative">
-        <!-- Mentor's Video Feed -->
-        <!-- Use JavaScript to dynamically load the mentor's video feed -->
-        <span
-          class="mentor-name absolute top-2 left-2 text-white text-sm font-semibold"
-          >Mentor's Name</span
-        >
-      </div>
-      <div
-        class="user-video-container bg-black w-56 h-56 absolute bottom-16 right-0"
-        id="selfUserVideo"
-      >
-        <!-- User's Video Feed -->
-        <!-- Use JavaScript to dynamically load the user's video feed -->
-      </div>
-    </main>
+  <!-- Top Bar -->
+  <header class="top-bar bg-green-600 text-white py-4 fixed w-full top-0 flex items-center justify-between px-4">
+    <button class="text-white">
+      <i class="fas fa-arrow-left text-xl"></i>
+    </button>
+    <div class="text-center">
+      <span class="text-sm">00:00</span>
+    </div>
+    <button class="text-white">
+      <i class="fas fa-camera text-xl"></i>
+    </button>
+  </header>
 
-    <!-- Bottom Bar -->
-    <footer
-      class="bottom-bar bg-green-600 text-white py-4 fixed w-full bottom-0 flex items-center justify-between px-4"
-    >
-      <button id="videoToggleIcon" class="w-8 text-white text-center">
-        <i class="fas fa-video text-xl"></i>
-      </button>
+  <!-- Video Containers -->
+  <main class="video-containers flex flex-col items-center justify-center pt-16">
+    <div class="mentor-video-container bg-black w-full h-3/4 relative">
+      <!-- Mentor's Video Feed -->
+      <!-- Use JavaScript to dynamically load the mentor's video feed -->
+      <span class="mentor-name absolute top-2 left-2 text-white text-sm font-semibold">Mentor's Name</span>
+    </div>
+    <div class="user-video-container bg-black w-56 h-56 absolute bottom-16 right-0" id="selfUserVideo">
+      <!-- User's Video Feed -->
+      <!-- Use JavaScript to dynamically load the user's video feed -->
+    </div>
+  </main>
 
-      <button id="endCallButton" class="text-red-600">
-        <i class="fas fa-phone-slash text-xl"></i>
-      </button>
+  <!-- Bottom Bar -->
+  <footer class="bottom-bar bg-green-600 text-white py-4 fixed w-full bottom-0 flex items-center justify-between px-4">
+    <button id="videoToggleIcon" class="w-8 text-white text-center">
+      <i class="fas fa-video text-xl"></i>
+    </button>
 
-      <button id="muteToggleIcon" class="w-8 text-white text-center">
-        <i class="fas fa-microphone text-xl"></i>
-      </button>
-      <button id="changeCameraButton" class="text-white hidden">
-        <i class="fas fa-camera text-xl"></i>
-      </button>
-    </footer>
+    <button id="endCallButton" class="text-red-600">
+      <i class="fas fa-phone-slash text-xl"></i>
+    </button>
 
-    <!-- JavaScript for dynamic icon changes and functionality -->
-    <script src="{% static 'core/scripts/videocallUI.js' %}"></script>
-    <script src="{% static 'core/scripts/videocallRTC.js' %}"></script>
-  </body>
+    <button id="muteToggleIcon" class="w-8 text-white text-center">
+      <i class="fas fa-microphone text-xl"></i>
+    </button>
+    <button id="changeCameraButton" class="text-white hidden">
+      <i class="fas fa-camera text-xl"></i>
+    </button>
+  </footer>
+
+  <!-- JavaScript for dynamic icon changes and functionality -->
+  <script src="{%static 'core/scripts/notificationSocket.js'%}"></script>
+  <script src="{%static 'core/scripts/initialCall.js'%}"></script>
+  <script src="{%static 'core/scripts/videocallUI.js' %}"></script>
+  <script src="{%static 'core/scripts/videocallRTC.js' %}"></script>
+</body>
+
 </html>

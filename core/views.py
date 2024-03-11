@@ -38,5 +38,6 @@ def handle_logout(request):
     logout(request)
     return redirect(reverse('core:login'))
 
+@login_required(login_url='core:login')
 def videocall(request,username=None):
     return render(request,'core/videocall.html')

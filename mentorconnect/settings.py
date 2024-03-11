@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    "signalling",
     'core.apps.CoreConfig',
     "django.contrib.admin",
     "django.contrib.auth",
@@ -68,7 +70,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "mentorconnect.wsgi.application"
+# WSGI_APPLICATION = "mentorconnect.wsgi.application"
+ASGI_APPLICATION = "mentorconnect.asgi.application"
 
 
 # Database
@@ -123,3 +126,12 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "core.User"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}

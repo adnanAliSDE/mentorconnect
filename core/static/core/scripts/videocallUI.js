@@ -1,4 +1,3 @@
-// Variable to store the initial position of the dragged element
 let initialX;
 let initialY;
 
@@ -41,20 +40,20 @@ function loadUserVideo() {
 }
 
 // Function to handle video toggle (on/off)
-let isVideoOn=true;
+let isVideoOn = true;
 function toggleVideo() {
     const videoIcon = document.getElementById('videoToggleIcon').firstElementChild;
-    
+
     if (isVideoOn) {
         console.log("Video Off");
         videoIcon.classList.remove('fa-video');
         videoIcon.classList.add('fa-video-slash');
-        isVideoOn=false
+        isVideoOn = false
     } else {
         console.log("Video On");
         videoIcon.classList.remove('fa-video-slash');
         videoIcon.classList.add('fa-video');
-        isVideoOn=true
+        isVideoOn = true
     }
 }
 
@@ -87,7 +86,7 @@ function changeCamera() {
 }
 
 // Event listener to load video feeds when the page loads
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     loadMentorVideo();
     loadUserVideo();
 });
@@ -99,8 +98,29 @@ document.getElementById('endCallButton').addEventListener('click', endCall);
 document.getElementById('changeCameraButton').addEventListener('click', changeCamera);
 
 // Event listeners for drag events
-const selfUserVideo=document.getElementById('selfUserVideo')
+const selfUserVideo = document.getElementById('selfUserVideo')
 
 selfUserVideo.addEventListener('dragstart', dragStart);
 selfUserVideo.addEventListener('drag', drag);
 selfUserVideo.addEventListener('dragend', dragEnd);
+
+
+// Function to update content of call status modal
+function updateCallStatus(content) {
+    const callStatusContent = document.getElementById('callStatusContent');
+    callStatusContent.textContent = content;
+}
+// Function to toggle visibility of call status modal with animation
+function toggleCallStatusModal() {
+    const modal = document.getElementById('callStatusModal');
+    const container = document.querySelector('.modal-container');
+
+    modal.classList.toggle('hidden');
+    container.classList.toggle('scale-0');
+    container.classList.toggle('scale-1');
+}
+
+
+const remoteUser=window.location.pathname.split('/').at(-1)
+updateCallStatus(`Connecting to ${remoteUser}...`)
+toggleCallStatusModal()
