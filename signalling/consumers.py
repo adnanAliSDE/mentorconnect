@@ -86,7 +86,7 @@ class SignallingConsumer(WebsocketConsumer):
 
 class RTCconsumer(WebsocketConsumer):
     def connect(self):
-        self.remote_user = self.scope["url_route"]["kwargs"]["remote_user"]
+        self.remote_user = self.scope["url_route"]["kwargs"]["recvr"]
         self.room_group_name = f"call_{self.scope['user'].username}"
 
         async_to_sync(self.channel_layer.group_add)(
@@ -103,6 +103,27 @@ class RTCconsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        type=text_data_json.get("type")
 
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "chat_message", "message": message})
+        if type=='offer':
+            async_to_sync(self.channel_layer.group_send)(
+                f"call_{self.remote_user}", {"type": "call.offer", "message": message})
+
+        elif type=='answer':
+            async_to_sync(self.channel_layer.group_send)(
+                f"call_{self.remote_user}", {"type": "call.answer", "message": message})
+
+        elif type=='end':
+            async_to_sync(self.channel_layer.group_send)(
+                f"call_{self.remote_user}", {"type": "call.end", "message": message})
+    
+    def call_offer(self,data):
+        print('offer sent')
+        self.send(json.dumps(data))
+
+    def call_end(self,data):
+        self.send(json.dumps(data))
+
+    def call_answer(self,data):
+        print('answer sent')
+        self.send(json.dumps(data))

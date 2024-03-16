@@ -102,12 +102,12 @@
   <main class="video-containers flex flex-col items-center justify-center pt-16">
     <div class="mentor-video-container bg-black w-full h-3/4 relative">
       <!-- Mentor's Video Feed -->
+      <video id='remote-video-element'   class="w-full h-full" autoplay playsinline></video>
       <!-- Use JavaScript to dynamically load the mentor's video feed -->
       <span class="mentor-name absolute top-2 left-2 text-white text-sm font-semibold">Mentor's Name</span>
     </div>
     <div class="user-video-container bg-black w-56 h-56 absolute bottom-16 right-0" id="selfUserVideo">
-      <!-- User's Video Feed -->
-      <!-- Use JavaScript to dynamically load the user's video feed -->
+      <video id='self-video-element' class="w-full h-full" autoplay playsinline></video>
     </div>
   </main>
 

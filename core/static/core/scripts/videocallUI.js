@@ -5,7 +5,7 @@ let initialY;
 function dragStart(event) {
     initialX = event.clientX - parseFloat(getComputedStyle(event.target).left);
     initialY = event.clientY - parseFloat(getComputedStyle(event.target).top);
-    console.log(`Drag start x:${initialX} y:${initialY}`)
+    // console.log(`Drag start x:${initialX} y:${initialY}`)
 }
 
 // Function to handle the dragging event
@@ -15,7 +15,7 @@ function drag(event) {
     const y = event.clientY;
     event.target.style.left = `${x}px`;
     event.target.style.top = `${y}px`;
-    console.log(event.target)
+    // console.log(event.target)
     console.log(`Drag event x:${x} y:${y}`)
 
 }
@@ -29,13 +29,13 @@ function dragEnd(event) {
 
 // Function to load mentor's video feed dynamically
 function loadMentorVideo() {
-    console.log("Loading mentor's video feed...");
+    // console.log("Loading mentor's video feed...");
     // Code to load mentor's video feed
 }
 
 // Function to load user's video feed dynamically
 function loadUserVideo() {
-    console.log("Loading user's video feed...");
+    // console.log("Loading user's video feed...");
     // Code to load user's video feed
 }
 

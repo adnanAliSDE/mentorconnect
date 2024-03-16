@@ -25,7 +25,7 @@ function init() {
             socket.close(3001)
             window.location.href = url
         }
-        console.log(data.message);
+        // console.log(data.message);
     }
 }
 socket.onopen = init
