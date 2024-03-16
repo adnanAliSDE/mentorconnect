@@ -34,10 +34,15 @@ def handle_login(request):
     return render(request,'core/login.html')
 
 
+@login_required(login_url='core:login')
 def handle_logout(request):
     logout(request)
     return redirect(reverse('core:login'))
 
 @login_required(login_url='core:login')
-def videocall(request,username=None):
+def videocall(request,remote_user=None):
     return render(request,'core/videocall.html')
+
+@login_required(login_url='core:login')
+def wait_for_call(request,remote_user=None):
+    return render(request,'core/waitScreen.html')

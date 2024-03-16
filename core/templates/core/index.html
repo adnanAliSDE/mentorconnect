@@ -58,7 +58,7 @@
                         <p class="text-gray-600 text-sm mb-4">@{{mentor.username}}</p>
                     </div>
                 </div>
-                <a href={% url 'core:videocall' username=mentor.username%}><button
+                <a href={% url 'core:wait_for_call' remote_user=mentor.username%}><button
                         class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Video
                         Call</button></a>
                 <a href="#"><button

@@ -81,12 +81,12 @@
     <div class="modal-overlay absolute inset-0 bg-gray-900 opacity-50"></div>
     <div class="modal-container bg-white w-96 p-6 rounded-lg shadow-lg transform ">
       <div class="spinner mx-auto"></div> <!-- Spinner element -->
-      <div id="callStatusContent" class="text-center mt-4">Connecting...</div>
+      <div id="callStatusContent" class="text-center mt-4">Calling...</div>
     </div>
   </div>
 
   <!-- Top Bar -->
-  <header class="top-bar bg-green-600 text-white py-4 fixed w-full top-0 flex items-center justify-between px-4">
+  <header class="hidden top-bar bg-green-600 text-white py-4 fixed w-full top-0 flex items-center justify-between px-4">
     <button class="text-white">
       <i class="fas fa-arrow-left text-xl"></i>
     </button>
@@ -99,7 +99,7 @@
   </header>
 
   <!-- Video Containers -->
-  <main class="video-containers flex flex-col items-center justify-center pt-16">
+  <main class="hidden flex flex-col items-center justify-center pt-16">
     <div class="mentor-video-container bg-black w-full h-3/4 relative">
       <!-- Mentor's Video Feed -->
       <!-- Use JavaScript to dynamically load the mentor's video feed -->
@@ -112,7 +112,7 @@
   </main>
 
   <!-- Bottom Bar -->
-  <footer class="bottom-bar bg-green-600 text-white py-4 fixed w-full bottom-0 flex items-center justify-between px-4">
+  <footer class="hidden bottom-bar bg-green-600 text-white py-4 fixed w-full bottom-0 flex items-center justify-between px-4">
     <button id="videoToggleIcon" class="w-8 text-white text-center">
       <i class="fas fa-video text-xl"></i>
     </button>
@@ -130,8 +130,9 @@
   </footer>
 
   <!-- JavaScript for dynamic icon changes and functionality -->
+  <script src="{%static 'core/scripts/notificationSocket.js'%}"></script>
+  <script src="{%static 'core/scripts/initiateCall.js'%}"></script>
   <script src="{%static 'core/scripts/videocallUI.js' %}"></script>
-  <script src="{%static 'core/scripts/handleRTC.js' %}"></script>
 </body>
 
 </html>

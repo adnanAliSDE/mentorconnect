@@ -1,7 +1,7 @@
 const url = `wss://${window.location.host}/wss/signalling/`
 const socket = new WebSocket(url)
-// UI components:
-// let notificationModal
+let currentSender = ''
+
 const VidCallAlert = (remoteUser) => {
     const content = `
     <div id='notification-modal' class="video-call-notification absolute z-10 top-0 left-0 bg-gray-800 w-full h-full flex items-center justify-center">
@@ -19,24 +19,45 @@ const VidCallAlert = (remoteUser) => {
     notificationModal = document.getElementById('notification-modal')
 }
 
+const callObject = {
+    type: 'call.recvd',
+    message: {
+        status: null,
+        remote_user: null
+    }
+}
+
+const sendCall = () => {
+    socket.send(JSON.stringify(callObject))
+}
+
 const acceptCall = (e) => {
     notificationModal.remove()
     console.log("Call Accepted", e)
+    callObject.message.status = 'accept',
+    callObject.message.remote_user = currentSender,
+    sendCall()
+
+    const url=`${window.location.origin}/videocall/${currentSender}?outgoing=false`
+    socket.close(3001)
+    window.location.href=url
 }
 
 const rejectCall = (e) => {
     notificationModal.remove()
     console.log("Call rejected")
+    callObject.message.status = 'reject',
+        callObject.message.remote_user = currentSender,
+        sendCall()
 }
 
 socket.onopen = (e) => {
     console.log('Socket Connected')
-    socket.send(JSON.stringify({ message: 'PING' }))
-    console.log('Message Sent')
 };
 
 function handleVidCallNot({ content, remote_user }) {
     console.log(`Video call from ${remote_user}`)
+    currentSender = remote_user
     VidCallAlert(remote_user)
 }
 

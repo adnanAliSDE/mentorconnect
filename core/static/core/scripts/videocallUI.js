@@ -110,17 +110,25 @@ function updateCallStatus(content) {
     const callStatusContent = document.getElementById('callStatusContent');
     callStatusContent.textContent = content;
 }
-// Function to toggle visibility of call status modal with animation
-function toggleCallStatusModal() {
-    const modal = document.getElementById('callStatusModal');
-    const container = document.querySelector('.modal-container');
 
+// Function to toggle visibility of call status modal with animation
+const modal = document.getElementById('callStatusModal');
+const container = document.querySelector('.modal-container');
+function toggleCallStatusModal() {
     modal.classList.toggle('hidden');
     container.classList.toggle('scale-0');
     container.classList.toggle('scale-1');
 }
 
 
-const remoteUser=window.location.pathname.split('/').at(-1)
+const remoteUser = window.location.pathname.split('/').at(-1)
 updateCallStatus(`Connecting to ${remoteUser}...`)
-toggleCallStatusModal()
+
+let isModalOpen = false
+const showModal = (open = true) => {
+    if (open && !isModalOpen) {
+        toggleCallStatusModal()
+    } else if (!open && isModalOpen) {
+        toggleCallStatusModal()
+    }
+}
