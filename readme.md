@@ -1,1 +1,1 @@
-# Hello World
+# A peer-to-peer video calling application using WebRTC
