@@ -2,10 +2,23 @@ const remote_user = window.location.pathname.split('/').at(-1)
 const url = `wss://${window.location.hostname}/wss/RTC/${remote_user}/`
 const socket = new WebSocket(url)
 
-// WebRTC stuff
-let peerConnection = new RTCPeerConnection()
+// WebRTC 
+const queryString = window.location.search;
+const params = new URLSearchParams(queryString);
+const isOutgoing = params.get('outgoing');
+
 let localStream;
 let remoteStream;
+
+const servers = {
+    iceServers: [
+        {
+            urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302']
+        }
+    ]
+}
+
+let peerConnection = new RTCPeerConnection(servers)
 
 let init = async () => {
     localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
@@ -25,41 +38,32 @@ let init = async () => {
 }
 
 let createOffer = async () => {
-    console.log("I am createOffer.");
-
-    try {
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        console.log("Local description set successfully.");
-
-        // Return the status object when local description is set
-        return { status: "ok" };
-    } catch (error) {
-        console.error("Error creating or setting local description:", error);
-        throw error; // Propagate the error
-    }
-};
-
-// Set up the onicecandidate event handler
-let offerSDP={}
-peerConnection.onicecandidate = (event) => {
-    // Event that fires off when a new offer ICE candidate is created
-    if (event.candidate) {
-        console.log("offer ICE fired");
-        offerSDP.o = JSON.stringify(peerConnection.localDescription);
-        console.log(offerSDP);
-    }
-};
-
-
-let answerSDP;
-let createAnswer = async (offer) => {
-    offer = JSON.parse(offer)
     peerConnection.onicecandidate = async (event) => {
-        //Event that fires off when a new answer ICE candidate is created
+        console.log('Candidate: ', event)
+
         if (event.candidate) {
-            console.log('Adding answer candidate...:', event.candidate)
-            answerSDP = JSON.stringify(peerConnection.localDescription)
+            socket.send(
+                JSON.stringify({ type: 'candidate', message: { candidate: event.candidate } })
+            )
+        }
+    };
+
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    console.log("Offer: ", offer)
+    socket.send(
+        JSON.stringify({ type: 'offer', message: { offer } })
+    )
+}
+
+let createAnswer = async (offer) => {
+    peerConnection.onicecandidate = async (event) => {
+        console.log('Candidate: ', event)
+
+        if (event.candidate) {
+            socket.send(
+                JSON.stringify({ type: 'candidate', message: { candidate: event.candidate } })
+            )
         }
     };
 
@@ -67,52 +71,44 @@ let createAnswer = async (offer) => {
 
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
+    console.log("Answer: ", answer)
+    socket.send(
+        JSON.stringify({ type: 'answer', message: { answer } })
+    )
+
 }
 
 let addAnswer = async (answer) => {
-    console.log('Add answer triggerd')
-    answer = JSON.parse(answer)
-    console.log('answer:', answer)
+    console.log('RTC connection successfull.')
     if (!peerConnection.currentRemoteDescription) {
         peerConnection.setRemoteDescription(answer);
     }
+    showModal(open = false)
 }
 
 init()
 
-const queryString = window.location.search;
-const params = new URLSearchParams(queryString);
 
-const isOutgoing = params.get('outgoing');
+// Main logic
 
-socket.onopen = async (e) => {
-    const o = await createOffer()
-    console.log(o);
-    setTimeout(() => {
-        if (isOutgoing === 'true') {
-            if (offerSDP.o != undefined) {
-                socket.send(JSON.stringify({ "type": "offer", "message": { "offerSDP": offerSDP.o } }))
-                console.log(offerSDP);
-            }
-            else {
-                console.log('Offer undefined');
-            }
-        }
-    }, 5000);
+socket.onopen = (e) => {
+
+    if (isOutgoing === 'true') {
+        createOffer()
+    }
+
 }
 
 socket.onmessage = (e) => {
     const { type, message } = JSON.parse(e.data)
-    console.log(type, message)
+    console.log('Message recvd: ', message)
     if (type === 'call.offer') {
-        createAnswer(message.offerSDP)
-        setTimeout(() => {
-            socket.send(
-                socket.send(JSON.stringify({ type: "answer", message: { answerSDP } }))
-            )
-        }, 5000);
+        createAnswer(message.offer)
     }
     else if (type === 'call.answer') {
-        addAnswer(message.answerSDP)
+        addAnswer(message.answer)
+    }
+    else if (type === 'call.candidate') {
+        peerConnection.addIceCandidate(message.candidate)
     }
 }

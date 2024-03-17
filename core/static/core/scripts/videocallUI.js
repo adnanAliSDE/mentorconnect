@@ -124,8 +124,8 @@ function toggleCallStatusModal() {
 const remoteUser = window.location.pathname.split('/').at(-1)
 updateCallStatus(`Connecting to ${remoteUser}...`)
 
-let isModalOpen = false
-const showModal = (open = true) => {
+let isModalOpen = true
+const showModal = (open = false) => {
     if (open && !isModalOpen) {
         toggleCallStatusModal()
     } else if (!open && isModalOpen) {

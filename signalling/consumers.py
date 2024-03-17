@@ -104,6 +104,7 @@ class RTCconsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
         type=text_data_json.get("type")
+        print(type,message)
 
         if type=='offer':
             async_to_sync(self.channel_layer.group_send)(
@@ -113,10 +114,18 @@ class RTCconsumer(WebsocketConsumer):
             async_to_sync(self.channel_layer.group_send)(
                 f"call_{self.remote_user}", {"type": "call.answer", "message": message})
 
+        elif type=='candidate':
+            async_to_sync(self.channel_layer.group_send)(
+                f"call_{self.remote_user}", {"type": "call.candidate", "message": message})
+
         elif type=='end':
             async_to_sync(self.channel_layer.group_send)(
                 f"call_{self.remote_user}", {"type": "call.end", "message": message})
     
+    def call_candidate(self,data):
+        print('candidate sent')
+        self.send(json.dumps(data))
+
     def call_offer(self,data):
         print('offer sent')
         self.send(json.dumps(data))
