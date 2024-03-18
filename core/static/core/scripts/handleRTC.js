@@ -18,29 +18,29 @@ const servers = {
     ]
 }
 
-let peerConnection = new RTCPeerConnection(servers)
+const peerConnection = new RTCPeerConnection(servers)
 
-let init = async () => {
+const init = async () => {
     localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     remoteStream = new MediaStream()
     document.getElementById('self-video-element').srcObject = localStream
     document.getElementById('remote-video-element').srcObject = remoteStream
 
-    localStream.getTracks().forEach((track) => {
-        peerConnection.addTrack(track, localStream);
-    });
-
     peerConnection.ontrack = (event) => {
+        console.log('pc ontrack: ', event)
         event.streams[0].getTracks().forEach((track) => {
             remoteStream.addTrack(track);
         });
     };
+
+    localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+        console.log("Localstream Track: ", track)
+    });
 }
 
-let createOffer = async () => {
+const createOffer = async () => {
     peerConnection.onicecandidate = async (event) => {
-        console.log('Candidate: ', event)
-
         if (event.candidate) {
             socket.send(
                 JSON.stringify({ type: 'candidate', message: { candidate: event.candidate } })
@@ -48,21 +48,23 @@ let createOffer = async () => {
         }
     };
 
-    const offer = await peerConnection.createOffer();
+    let offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(offer);
-    console.log("Offer: ", offer)
+
+    offer = JSON.stringify(offer)
     socket.send(
         JSON.stringify({ type: 'offer', message: { offer } })
     )
 }
 
-let createAnswer = async (offer) => {
+const createAnswer = async (offer) => {
+    offer = JSON.parse(offer)
     peerConnection.onicecandidate = async (event) => {
-        console.log('Candidate: ', event)
 
         if (event.candidate) {
+            let candidate = JSON.stringify(event.candidate)
             socket.send(
-                JSON.stringify({ type: 'candidate', message: { candidate: event.candidate } })
+                JSON.stringify({ type: 'candidate', message: { candidate } })
             )
         }
     };
@@ -71,44 +73,51 @@ let createAnswer = async (offer) => {
 
     let answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(answer);
-    console.log("Answer: ", answer)
+    answer = JSON.stringify(answer)
     socket.send(
         JSON.stringify({ type: 'answer', message: { answer } })
     )
 
 }
 
-let addAnswer = async (answer) => {
-    console.log('RTC connection successfull.')
+const addAnswer = async (answer) => {
+    answer = JSON.parse(answer)
     if (!peerConnection.currentRemoteDescription) {
         peerConnection.setRemoteDescription(answer);
     }
-    showModal(open = false)
 }
 
-init()
-
-
-// Main logic
-
 socket.onopen = (e) => {
-
     if (isOutgoing === 'true') {
         createOffer()
     }
-
 }
 
-socket.onmessage = (e) => {
-    const { type, message } = JSON.parse(e.data)
-    console.log('Message recvd: ', message)
-    if (type === 'call.offer') {
-        createAnswer(message.offer)
+let isConnectionSuccess = false
+socket.onmessage = async ({ data }) => {
+    const { type, message } = JSON.parse(data)
+
+    switch (type) {
+        case 'call.offer':
+            await createAnswer(message.offer)
+            isConnectionSuccess = true
+            break;
+
+        case 'call.answer':
+            await addAnswer(message.answer)
+            isConnectionSuccess = true
+            break;
+
+        case 'call.candidate':
+            await peerConnection.addIceCandidate(JSON.parse(message.candidate))
+            break;
+
+        default:
+            break;
     }
-    else if (type === 'call.answer') {
-        addAnswer(message.answer)
-    }
-    else if (type === 'call.candidate') {
-        peerConnection.addIceCandidate(message.candidate)
+
+    if (isConnectionSuccess) {
+        console.log("Connection success.")
+        showModal(open = false)
     }
 }
