@@ -15,7 +15,7 @@
 <body class="bg-gray-100">
     <!-- Header with Navigation Bar -->
     <header class="bg-green-600 text-white py-4 relative">
-        <div class="container mx-auto flex items-center justify-between px-4">
+        <div class="container flex items-center justify-between px-4">
             <div class="text-lg font-semibold">MentorConnect</div>
             <!-- Hamburger Menu -->
             <button id="menuBtn" class="md:hidden">
@@ -40,8 +40,7 @@
         </div>
     </header>
 
-    <!-- Mentor Cards Container with Heading -->
-    <section class="container mx-auto mt-8">
+    <section class="container mt-8 p-4 ">
         <h1 class="text-2xl font-semibold mb-4">Available Mentors</h1>
         <!-- Mentor Cards -->
         <div id="mentorCards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -53,24 +52,26 @@
                     <img width="56px"
                         src="https://images.pexels.com/photos/3190334/pexels-photo-3190334.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                         alt="Mentor 1" class="h-auto rounded-full mb-4">
-                    <div class="details ml-2">
-                        <h2 class="text-lg font-semibold mb-2">{{mentor.first_name}} {{mentor.last_name}}</h2>
+                    <div class="details ml-3">
+                        <h2 class="text-lg font-semibold">{{mentor.first_name}} {{mentor.last_name}}</h2>
                         <p class="text-gray-600 text-sm mb-4">@{{mentor.username}}</p>
                     </div>
                 </div>
-                <a href={% url 'core:wait_for_call' remote_user=mentor.username%}><button
-                        class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700">Video
-                        Call</button></a>
-                <a href="#"><button
-                        class="border border-green-600 text-green-600 px-4 py-2 rounded-full ml-2 hover:bg-green-100">View
-                        Profile</button></a>
+                <div class="btn-container flex justify-between items-center">
+                    <a class="flex-1 mr-0.5" href={% url 'core:wait_for_call' remote_user=mentor.username%}><button
+                            class="w-full bg-green-600 flex-auto text-white px-4 py-2 rounded-md hover:bg-green-700">Video
+                            Call</button></a>
+                    <a class="flex-1 ml-0.5" href="#"><button
+                            class="w-full border flex-auto border-green-600 text-green-600 px-4 py-2 rounded-md  hover:bg-green-100">View
+                            Profile</button></a>
+                </div>
             </div>
             {%endfor%}
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-green-600 text-white py-4 mt-8">
+    <footer class="bg-green-600 absolute bottom-0 left-0 w-full text-white py-4 mt-8">
         <div class="container mx-auto text-center">
             <p>&copy; 2024-2025 MentorConnect</p>
         </div>
