@@ -11,17 +11,10 @@ let localStream;
 let remoteStream;
 
 let init = async () => {
-    const mediaConstraints = {
-        video: {
-            width: { min: 640, ideal: 1920, max: 1920 },
-            height: { min: 400, ideal: 1080 },
-        }, audio: true
-    }
-    localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints)
+    localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     remoteStream = new MediaStream()
-
-    document.getElementById('self-video-element').srcObject = localStream
-    document.getElementById('remote-video-element').srcObject = remoteStream
+    document.getElementById('user-1').srcObject = localStream
+    document.getElementById('user-2').srcObject = remoteStream
 
     localStream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, localStream);
@@ -45,7 +38,6 @@ let createOffer = async () => {
 
         //Event that fires off when a new offer ICE candidate is created
         if (event.candidate) {
-            // document.getElementById('offer-sdp').value = JSON.stringify(peerConnection.localDescription)
             const candidate = JSON.stringify(event.candidate)
             socket.send(
                 JSON.stringify({ type: 'candidate', message: { candidate } })
@@ -69,7 +61,6 @@ let createAnswer = async (offer) => {
         //Event that fires off when a new answer ICE candidate is created
         if (event.candidate) {
             console.log('Adding answer candidate...:', event.candidate)
-            // document.getElementById('answer-sdp').value = JSON.stringify(peerConnection.localDescription)
             candidate = JSON.stringify(event.candidate)
             socket.send(
                 JSON.stringify({ type: 'candidate', message: { candidate } })
@@ -104,22 +95,23 @@ const params = new URLSearchParams(queryString);
 const isOutgoing = params.get('outgoing');
 socket.onopen = function (e) {
     if (isOutgoing === 'true') {
-        setTimeout(createOffer, 10 * 1000)
+        setTimeout(createOffer, 2 * 1000)
     }
 }
 
-const callStatusModal=document.getElementById('callStatusModal')
 socket.onmessage = ({ data }) => {
     const { type, message } = JSON.parse(data)
     if (type === 'call.offer') {
-        callStatusModal.classList.add('hidden')
         createAnswer(message.offer)
     }
     else if (type === 'call.candidate') {
         peerConnection.addIceCandidate(JSON.parse(message.candidate))
     }
     else if (type === 'call.answer') {
-        callStatusModal.classList.add('hidden')
         addAnswer(message.answer)
+    }
+
+    if (peerConnection.currentRemoteDescription) {
+        showModal(open = false)
     }
 }

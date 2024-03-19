@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'webRTC_conn',
     'daphne',
     "signalling",
     'core.apps.CoreConfig',
